@@ -84,7 +84,7 @@ export function repo(router) {
     let repo
     try {
       repo = await repositoryHandler.onGetOne(id, user, true)
-    } catch(e) {
+    } catch (e) {
       ctx.throw(404, e)
     }
     const zapprFileContent = await githubService.readZapprFile(repo.json.owner.login, repo.json.name, user.accessToken)

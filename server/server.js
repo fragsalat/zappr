@@ -1,13 +1,16 @@
 import 'source-map-support/register'
 
 import Koa from 'koa'
-import Router from 'koa-router'
 import serve from 'koa-static'
 import session from 'koa-generic-session'
 import bodyParser from 'koa-bodyparser'
 import convert from 'koa-convert'
 import morgan from 'koa-morgan'
+import Pug from 'koa-pug'
+import router from './router'
 import generateProblemMiddleware from './middleware/problem'
+import generatePrometheusMiddleware from './middleware/prometheus'
+import renderStatic from './react/render-static.jsx'
 import Umzug from 'umzug'
 import Sequelize from 'sequelize'
 import nconf from './nconf'
@@ -29,21 +32,17 @@ app.proxy = true
 // Sessions
 app.keys = [nconf.get('SESSION_SECRET')]
 
-// Routing
-import { health } from './routes/health'
-import { authorize, login, logout } from './routes/auth.js'
-import { env, repos, repo } from './routes/api'
-import renderStatic from './react/render-static.jsx'
-
-const router = [health, authorize, login, logout, env, repos, repo].
-reduce((router, route) => route(router), Router())
-
 // Session store
 const store = new DatabaseStore()
 
 // HTTP logs
 const morganFormat = nconf.get('MORGAN_FORMAT')
 const morganSkip = (req, res) => res.statusCode < nconf.get('MORGAN_THRESH')
+
+// Static pages
+const pug = new Pug({
+  viewPath: './server/views'
+})
 
 /**
  * Initialize the Koa application instance.
@@ -55,6 +54,9 @@ export function init(options = {}) {
   const passport = initPassport(options.PassportStrategy)
 
   return app.
+  use(generatePrometheusMiddleware(router, {
+    ignore: [/^\/repository/]
+  })).
   use(generateProblemMiddleware({
     exposableErrorTypes: [
       CHECK_ERROR_TYPE,
@@ -66,6 +68,7 @@ export function init(options = {}) {
   use(bodyParser()).
   use(passport.initialize()).
   use(passport.session()).
+  use(convert(pug.middleware)).
   use(router.routes()).
   use(router.allowedMethods()).
   use(convert(serve(nconf.get('STATIC_DIR'), {index: 'none'}))).
