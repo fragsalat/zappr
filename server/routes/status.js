@@ -1,24 +1,20 @@
 /**
  * Status page
  */
-import { RequestDuration, RequestRate } from '../middleware/prometheus'
+
+// TODO write MetricsProvider interface that gets metrics in defined format, async
+// TODO write TestMetricsProvider and  ZMONMetricsProvider
+// TODO include metrics here, with charts
+
+// TODO extend db to hold status messages. { type, message, valid_from, valid_until, author }
+// TODO extend api to manage status messages, but make it only accessible to configured admins
+// TODO fetch status messages and display them
 
 export function status(router) {
   return router.get('/status', function (ctx) {
-    const requestRates = RequestRate.get()
-                                    .values
-                                    .map(p => [`${p.labels.method} ${p.labels.path}`, p.value])
-                                    .sort((a, b) => a[0] > b[0] ? 1 : b[0] > a[0] ? -1 : 0)
-    const requestDurations = RequestDuration.get()
-                                            .values
-                                            .map(p => [`${p.labels.method} ${p.labels.path}`, p.labels.quantile, p.value])
-                                            .filter(rate => rate[1] >= 0.9)
-                                            .sort((a, b) => a[0] > b[0] ? 1 : b[0] > a[0] ? -1 : 0)
-
 
     ctx.render('status', {
-      request_rates: JSON.stringify(requestRates),
-      request_durations: JSON.stringify(requestDurations)
+      text: 'hello world'
     }, true)
   })
 }
