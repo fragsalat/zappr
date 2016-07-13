@@ -8,6 +8,7 @@ import convert from 'koa-convert'
 import morgan from 'koa-morgan'
 import Pug from 'koa-pug'
 import router from './router'
+import initMetrics from './metrics'
 import generateProblemMiddleware from './middleware/problem'
 import generatePrometheusMiddleware from './middleware/prometheus'
 import renderStatic from './react/render-static.jsx'
@@ -80,7 +81,7 @@ export function init(options = {}) {
  *
  * @param {number} port Port to listen on
  */
-async function start(port = nconf.get('APP_PORT')) {
+async function start(port = nconf.get('APP_PORT'), metricsPort = nconf.get('METRICS_PORT')) {
   const umzug = new Umzug({
     storage: 'sequelize',
     logging: logger('migration', 'info'),
@@ -111,6 +112,7 @@ async function start(port = nconf.get('APP_PORT')) {
   await db.sync()
   init().listen(port)
   log(`listening on port ${port}`)
+  initMetrics().listen(metricsPort || 3003)
 }
 
 if (require.main === module) {
