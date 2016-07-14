@@ -1,6 +1,23 @@
 html
   head
     title Zappr Status
+    link(href="/styles.min.css", rel="stylesheet")
   body
     h1 Status of Zappr
-    pre= text
+    table.table
+      thead
+        th
+        th Last hour
+        th Last day
+        th Last week
+      tbody
+        each metric in metrics.metrics
+          tr
+            td= metric
+            td= metrics.accumulated['-1h'][metric]
+            td= metrics.accumulated['-1d'][metric]
+            td= metrics.accumulated['-1w'][metric]
+    each msg in messages
+      div.alert(class='alert-' + msg.type)
+        h3= msg.title
+        div= msg.body
