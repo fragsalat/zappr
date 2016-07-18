@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize'
-import nconf from '../../server/nconf'
+import nconf from '../nconf'
 import { logger } from '../../common/debug'
 
 import { Message } from './'

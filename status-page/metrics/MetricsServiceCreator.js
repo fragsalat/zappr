@@ -1,4 +1,4 @@
-import nconf from '../../server/nconf'
+import nconf from '../nconf'
 import StubMetrics from './MetricsService'
 import ZMON from './ZMONService'
 import { logger } from '../../common/debug'

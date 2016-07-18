@@ -1,4 +1,6 @@
-import MetricsCreator from './metrics/MetricsServiceCreator'
+import MetricsCreator from '../metrics/MetricsServiceCreator'
+import { Message } from '../model'
+import marked from 'marked'
 
 // TODO write MetricsProvider interface that gets metrics in defined format, async
 // TODO write TestMetricsProvider and  ZMONMetricsProvider
@@ -14,26 +16,34 @@ import MetricsCreator from './metrics/MetricsServiceCreator'
 
 const metrics = MetricsCreator()
 
-export function status(router) {
+export default function status(router) {
   return router.get('/status', async function (ctx) {
     const metricsData = await metrics.getMetrics()
+    const showAllMessages = ctx.query.all === 'true'
+    const where = showAllMessages ? {} : {
+      valid_from: {
+        $or: {
+          $lte: new Date(),
+          $eq: null
+        }
+      },
+      valid_until: {
+        $or: {
+          $gte: new Date(),
+          $eq: null
+        }
+      }
+    }
+    const messages = await Message.findAll({
+      order: [['createdAt', 'DESC']],
+      where
+    })
     ctx.render('status', {
       text: 'hello world',
       metrics_debug: JSON.stringify(metricsData),
       metrics: metricsData,
-      messages: [{
-        title: 'Test maintenance',
-        body: 'test message',
-        type: 'warning'
-      }, {
-        title: 'Outage is over',
-        body: 'Phew',
-        type: 'success'
-      }, {
-        title: 'Partial outage',
-        body: 'Github is to blame!',
-        type: 'danger'
-      }]
+      showAllMessages,
+      messages: messages.map(msg => ({...msg.get({plain: true}), rendered: marked(msg.message)}))
     }, true)
   })
 }

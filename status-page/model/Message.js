@@ -1,7 +1,6 @@
 import { db } from './Database'
 import Sequelize from 'sequelize'
 
-//  { type, message, valid_from, valid_until, author }
 export default db.define('message', {
   id: {
     type: Sequelize.BIGINT,
@@ -14,18 +13,24 @@ export default db.define('message', {
     type: Sequelize.TEXT,
     allowNull: false
   },
+  title: {
+    type: Sequelize.TEXT,
+    allowNull: false
+  },
   message: {
     type: Sequelize.TEXT,
     allowNull: false
   },
-  author: {
+  author_username: {
     type: Sequelize.TEXT,
     allowNull: false
   },
-  valid_from: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW,
+  author_id: {
+    type: Sequelize.BIGINT,
     allowNull: false
+  },
+  valid_from: {
+    type: Sequelize.DATE
   },
   valid_until: {
     type: Sequelize.DATE

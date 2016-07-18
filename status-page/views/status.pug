@@ -1,23 +1,55 @@
+mixin message(msg)
+  div.message.alert(class='alert-' + msg.type)
+    h4.title= msg.title
+    if msg.valid_from
+      small= 'From ' + msg.valid_from.toISOString()
+    if msg.valid_until
+      small= ' until ' + msg.valid_until.toISOString()
+    div.body!= msg.rendered
+    div
+      a(href="https://github.com/" + msg.author_username)
+        img.avatar(src="https://avatars.githubusercontent.com/u/" + msg.author_id + "?v=3")
+      a(href="https://github.com/" + msg.author_username)= msg.author_username
+      span= ' on ' + msg.createdAt.toISOString()
+
 html
   head
     title Zappr Status
     link(href="https://bootswatch.com/paper/bootstrap.min.css", rel="stylesheet")
-  body
+    style.
+      h1 {
+        text-align: center;
+      }
+      img.avatar {
+        width: 25px;
+        border-radius: 100%;
+        margin-right: 10px;
+      }
+      .message .body {
+        margin: 2rem 0;
+      }
     h1 Status of Zappr
-    table.table
-      thead
-        th
-        th Last hour
-        th Last day
-        th Last week
-      tbody
-        each metric in metrics.metrics
-          tr
-            td= metric
-            td= metrics.accumulated['-1h'][metric]
-            td= metrics.accumulated['-1d'][metric]
-            td= metrics.accumulated['-1w'][metric]
-    each msg in messages
-      div.alert(class='alert-' + msg.type)
-        h3= msg.title
-        div= msg.body
+    div.container
+      div.row
+        div.col.col-md-12
+          table.table
+            thead
+              th
+              th Last hour
+              th Last day
+              th Last week
+            tbody
+              each metric in metrics.metrics
+                tr
+                  td= metric
+                  td= metrics.accumulated['-1h'][metric]
+                  td= metrics.accumulated['-1d'][metric]
+                  td= metrics.accumulated['-1w'][metric]
+      div.row
+        div.col.col-md-8.col-md-offset-2
+          each msg in messages
+            +message(msg)
+          unless showAllMessages
+            a.btn.btn-default(href="?all=true") Show all statuses
+
+
