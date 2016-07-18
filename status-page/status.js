@@ -1,4 +1,5 @@
-import MetricsCreator from '../service/MetricsServiceCreator'
+import MetricsCreator from './metrics/MetricsServiceCreator'
+
 // TODO write MetricsProvider interface that gets metrics in defined format, async
 // TODO write TestMetricsProvider and  ZMONMetricsProvider
 // TODO include metrics here, with charts

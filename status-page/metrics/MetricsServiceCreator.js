@@ -1,6 +1,6 @@
-import nconf from '../nconf'
-import StubMetrics from './metrics/MetricsService'
-import ZMON from './metrics/ZMONService'
+import nconf from '../../server/nconf'
+import StubMetrics from './MetricsService'
+import ZMON from './ZMONService'
 import { logger } from '../../common/debug'
 
 const warn = logger('metrics', 'warn')
