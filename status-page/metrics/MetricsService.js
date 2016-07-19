@@ -1,6 +1,6 @@
 export default class MetricsProvider {
-  constructor(config = {}) {
-    this.config = config
+  constructor(options = {}) {
+    this.options = options
   }
 
   async getMetrics() {

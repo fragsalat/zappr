@@ -1,16 +1,16 @@
 import path from 'path'
+import { Counter } from 'prom-client'
 import nconf from '../nconf'
 import GithubServiceError from './GithubServiceError'
 import { joinURL, promiseFirst, decode, getIn } from '../../common/util'
 import { logger } from '../../common/debug'
 import { request } from '../util'
-
 const debug = logger('github')
 const info = logger('github', 'info')
 const error = logger('github', 'error')
+const CallCounter = new Counter('github_api_requests', 'Status codes from Github API', ['type'])
 const HOOK_SECRET = nconf.get('GITHUB_HOOK_SECRET')
 const VALID_ZAPPR_FILE_PATHS = nconf.get('VALID_ZAPPR_FILE_PATHS')
-
 const API_URL_TEMPLATES = {
   HOOK: '/repos/${owner}/${repo}/hooks',
   PR: '/repos/${owner}/${repo}/pulls/${number}',
@@ -50,13 +50,20 @@ export class GithubService {
     const options = this.getOptions(method, path, payload, accessToken)
     const [response, body] = await request(options)
     const {statusCode} = response || {}
-
+    CallCounter.inc({type: 'total'}, 1)
     // 300 codes are for github membership checks
     if ([200, 201, 202, 203, 204, 300, 301, 302].indexOf(statusCode) < 0) {
       error(`${statusCode} ${method} ${path}`, response.body)
+      if (statusCode >= 400 && statusCode <= 499) {
+        CallCounter.inc({type: '4xx'}, 1)
+      } else if (statusCode >= 500 && statusCode <= 599) {
+        CallCounter.inc({ type: '5xx'}, 1)
+      }
       throw new GithubServiceError(response)
+    } else {
+      CallCounter.inc({type: 'success'}, 1)
+      return body
     }
-    else return body
   }
 
   setCommitStatus(user, repo, sha, status, accessToken) {

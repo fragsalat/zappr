@@ -8,7 +8,7 @@ export function metrics(router) {
   })
 }
 
-export default function initMetrics(options = {}) {
+export default function initMetrics() {
   const metricsRouter = metrics(Router())
   const metricApp = new Koa()
   return metricApp.use(metricsRouter.routes())

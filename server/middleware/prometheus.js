@@ -1,7 +1,7 @@
 import { Summary, Counter, register } from 'prom-client'
 
-export const RequestDuration = new Summary('request_duration_ms', 'ms to handle a request', ['method', 'path'])
-export const RequestRate = new Counter('request_rate', 'number of requests to a route', ['method', 'path'])
+export const RequestDuration = new Summary('api_response_time_ms', 'ms to handle a request', ['method', 'path'])
+export const RequestRate = new Counter('api_request_rate', 'number of requests to a route', ['method', 'path'])
 
 export function getCurrentMetrics() {
   return register.metrics()
