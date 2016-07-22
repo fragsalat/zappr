@@ -17,7 +17,7 @@ COPY config $ZAPPR_HOME/config
 COPY migrations/ $ZAPPR_HOME/migrations
 COPY scm-source.json /scm-source.json
 
-EXPOSE #{APP_PORT}
+EXPOSE ${APP_PORT}
 
 ENTRYPOINT ["npm"]
 CMD ["start"]
