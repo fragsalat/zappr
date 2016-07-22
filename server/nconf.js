@@ -40,13 +40,13 @@ function readYamlFile(file) {
  * However only this module ensures that nconf is properly
  * configured when it is imported for the first time.
  */
-export default nconf.use('memory')
-                    .argv()
-                    .env()
-                    .add('system', {type: 'literal', store: readYamlFile('./config/system.yaml')})
-                    .add('app', {
-                      type: 'literal', store: readYamlFile([
-                        './config/app.yaml',           // Configured at build-time.
-                        './config/app-opensource.yaml' // Default fallback for development.
-                      ])
-                    })
+const zapprConf = nconf.use('memory')
+                       .argv()
+                       .env()
+                       .add('system', {type: 'literal', store: readYamlFile('./config/system.yaml')})
+const DEFAULT_APP_CONFIG = './config/app-opensource.yaml'
+const appConfigFile = zapprConf.get('APP_CONFIGURATION_FILE') || DEFAULT_APP_CONFIG
+
+zapprConf.add('app', {type: 'literal', store: readYamlFile(appConfigFile)})
+
+export default zapprConf
