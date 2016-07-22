@@ -44,9 +44,9 @@ const zapprConf = nconf.use('memory')
                        .argv()
                        .env()
                        .add('system', {type: 'literal', store: readYamlFile('./config/system.yaml')})
-const DEFAULT_APP_CONFIG = './config/app-opensource.yaml'
-const appConfigFile = zapprConf.get('APP_CONFIGURATION_FILE') || DEFAULT_APP_CONFIG
+const DEFAULT_APP_CONFIG = 'app-opensource'
+const appConfig = zapprConf.get('APP_CONFIGURATION') || DEFAULT_APP_CONFIG
 
-zapprConf.add('app', {type: 'literal', store: readYamlFile(appConfigFile)})
+zapprConf.add('app', {type: 'literal', store: readYamlFile(`./config/${appConfig}.yaml`)})
 
 export default zapprConf
